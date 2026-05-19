@@ -1,31 +1,151 @@
-# Study Buddy Monorepo
+# 🎓 Study Buddy
 
-Academic graph collaboration web app built with Next.js, Express.js, and Neo4j.
+<div align="left">
 
-## Repository Structure
+[![Turborepo](https://img.shields.io/badge/Built%20with-Turborepo-000000.svg?style=flat-square&logo=turborepo)](https://turbo.build/)
+[![Next.js](https://img.shields.io/badge/Frontend-Next.js%2016-000000?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![Express.js](https://img.shields.io/badge/Backend-Express-000000?style=flat-square&logo=express)](https://expressjs.com/)
+[![Neo4j](https://img.shields.io/badge/Database-Neo4j%20AuraDB-008CC1?style=flat-square&logo=neo4j)](https://neo4j.com/)
+[![Node.js](https://img.shields.io/badge/Node.js-%3E%3D%2020.x-339933?style=flat-square&logo=node.js)](https://nodejs.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 
-- `apps/frontend`: Next.js client application with Tailwind CSS (Apple-like design system).
-- `apps/backend`: Express.js server boilerplate interacting with Neo4j AuraDB.
+</div>
 
-## Tech Stack
-* **Database:** Neo4j (Cypher Query Language)
-* **Backend:** Express.js (Node.js) + `neo4j-driver`
-* **Frontend:** Next.js + Tailwind CSS
-* **Monorepo Tooling:** Turborepo (`turbo`)
+An academic graph collaboration platform designed to help university students discover study partners, project collaborators, and research cohorts based on academic demographics, shared courses, skills, and learning goals. The project is structured as a high-performance monorepo using **Turborepo** and is powered by the **Neo4j Graph Database** engine.
 
-## Development
+---
 
-Install all dependencies in root:
-```bash
-npm install
+## 🛠️ Tech Stack & System Architecture
+
+| Layer | Technology | Purpose & Specifications |
+| :--- | :--- | :--- |
+| **Monorepo** | **Turborepo** (`turbo`) | Parallel tasks, cached pipelines, unified dependency management. |
+| **Frontend** | **Next.js 16** + **TypeScript** | React 19 Client UI with elegant, Apple-inspired Human Interface guidelines (Glassmorphism design language). |
+| **Backend** | **Express.js** + **Node.js** | RESTful API controller layer connected directly to Neo4j using the native `neo4j-driver`. |
+| **Database** | **Neo4j AuraDB** | Cloud-native Property Graph Database for lightning-fast relation traversals and Cypher queries. |
+| **Styling** | **Tailwind CSS v4** | Highly custom glassmorphism utility classes (`backdrop-blur-xl`, `bg-white/60`, custom typography). |
+
+---
+
+## 📊 Graph Database Schema (Neo4j)
+
+The application utilizes a rich social graph schema to match students. Relationship links and traversals form the foundation of our recommendations engine.
+
+```mermaid
+graph TD
+    User([User])
+    Fakultas([Fakultas])
+    Jurusan([Jurusan])
+    Angkatan([Angkatan])
+    Skill([Skill])
+    Interest([Interest])
+    Project([Project])
+    MataKuliah([Mata Kuliah])
+
+    User -->|BELONGS_TO_FAKULTAS| Fakultas
+    User -->|MAJORS_IN| Jurusan
+    User -->|CLASS_OF| Angkatan
+    User -->|HAS_SKILL| Skill
+    User -->|INTERESTED_IN| Interest
+    User -->|WORKING_ON| Project
+    Project -->|REQUIRES_SKILL| Skill
+    User -->|IS_FRIENDS_WITH| User
+    User -->|ENROLLED_IN| MataKuliah
 ```
 
-Start both applications in development mode simultaneously using Turbo:
-```bash
-npm run dev
+### Core Cypher Node Labels
+*   `User`: Academic profile (fields: `id`, `name`, `bio`).
+*   `Fakultas` / `Jurusan`: Faculty and major classifications.
+*   `Angkatan`: Academic cohort year (field: `year`).
+*   `Skill`: Technical or soft skill attributes.
+*   `Interest`: Academic and research domain interests.
+*   `Project`: Academic collaborations or group works (fields: `title`, `description`, `status`).
+*   `MataKuliah`: University courses (fields: `name`, `code`).
+
+---
+
+## 🧠 Core Search & Recommendation Algorithms
+
+The backend contains optimized **Cypher** queries executing four key matchmaking methodologies:
+
+1.  **Search by Academic Filters**
+    *   *Mechanism*: Filters student profiles based on strict intersections of `Fakultas`, `Jurusan`, or `Angkatan` nodes using dynamic `MATCH` and `WHERE` clauses.
+2.  **Recommendations by Shared Interests**
+    *   *Mechanism*: Computes overlap intersections of academic interests and orders peers by the count of mutual interest nodes.
+    *   *Cypher logic*: `MATCH (me:User {id: $userId})-[:INTERESTED_IN]->(i:Interest)<-[:INTERESTED_IN]-(other:User) RETURN other, count(i) ORDER BY count(i) DESC`
+3.  **Project Skill-Gap Matchmaking**
+    *   *Mechanism*: Connects active collaborative projects to prospective students holding required skillset nodes.
+    *   *Cypher logic*: `MATCH (me:User)-[:WORKING_ON]->(p:Project)-[:REQUIRES_SKILL]->(s:Skill)<-[:HAS_SKILL]-(other:User) RETURN other`
+4.  **Academic Proximity & Social Graph**
+    *   *Mechanism*: Evaluates relational proximity by prioritizing mutual friends (2-degree friendship paths) combined with departmental overlaps.
+
+---
+
+## 📁 Repository Structure
+
+```text
+.
+├── apps/
+│   ├── frontend/         # Next.js App Router client with Tailwind CSS v4
+│   └── backend/          # Express.js REST API server with Neo4j driver
+├── package.json          # Root workspace dependency declarations
+├── turbo.json            # Turborepo build and task execution pipeline
+└── README.md             # Technical documentation
 ```
 
-Build all applications:
-```bash
-npm run build
+---
+
+## 🚀 Getting Started
+
+### 📋 Prerequisites
+*   **Node.js**: `v20.x` or later
+*   **NPM**: `v10.x` or later (or `pnpm` / `yarn`)
+*   **Neo4j AuraDB**: An active AuraDB cloud instance setup with `neo4j+s` protocol
+
+### 🔑 Environment Configuration
+Create a `.env` file in `apps/backend/` and configure your credentials (see `.env.example`):
+
+```env
+NEO4J_URI=neo4j+s://<your-aura-db-id>.do.neo4j.io
+NEO4J_USERNAME=neo4j
+NEO4J_PASSWORD=<your-aura-password>
+PORT=3001
 ```
+
+### ⚙️ Installation & Development
+
+1.  **Clone the Repository**
+    ```bash
+    git clone https://github.com/kalldjo/MiniProject_StudyBuddy.git
+    cd MiniProject_StudyBuddy
+    ```
+
+2.  **Install Monorepo Dependencies**
+    ```bash
+    npm install
+    ```
+
+3.  **Run Development Servers**
+    Spins up Next.js client (`localhost:3000`) and Express server (`localhost:3001`) simultaneously:
+    ```bash
+    npm run dev
+    ```
+
+4.  **Build All Workspace Applications**
+    ```bash
+    npm run build
+    ```
+
+5.  **Lint Codebases**
+    ```bash
+    npm run lint
+    ```
+
+---
+
+## 🎨 UI/UX Design System
+
+The frontend conforms strictly to custom **Apple Human Interface Guidelines (HIG)** under a premium **Light Theme Glassmorphism** configuration:
+*   **Color Palette**: Primary high-contrast slate-black typography overlaid on rich white/60 translucent backdrops.
+*   **Aesthetic Details**: Heavy usage of `backdrop-blur-xl`, `border-white/40`, subtle floating drop-shadows, and smooth micro-animations.
+*   **Typography**: Clean geometric typography using standard `Inter` or system sans-serif headers with tight letter tracking.
