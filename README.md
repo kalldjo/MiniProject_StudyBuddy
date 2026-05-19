@@ -50,17 +50,22 @@ graph TD
     User -->|WORKING_ON| Project
     Project -->|REQUIRES_SKILL| Skill
     User -->|IS_FRIENDS_WITH| User
+    User -->|HAS_PENDING_REQUEST| User
     User -->|ENROLLED_IN| MataKuliah
 ```
 
 ### Core Cypher Node Labels
-*   `User`: Academic profile (fields: `id`, `name`, `bio`).
-*   `Fakultas` / `Jurusan`: Faculty and major classifications.
+*   `User`: Student academic profile node (fields: `id`, `email`, `password` (hashed), `name`, `bio`, `profilePicture`).
+*   `Fakultas` / `Jurusan`: Faculty and major tags.
 *   `Angkatan`: Academic cohort year (field: `year`).
-*   `Skill`: Technical or soft skill attributes.
-*   `Interest`: Academic and research domain interests.
-*   `Project`: Academic collaborations or group works (fields: `title`, `description`, `status`).
-*   `MataKuliah`: University courses (fields: `name`, `code`).
+*   `Skill`: Technical/academic skill nodes (field: `name`).
+*   `Interest`: Shared learning or domain interests (field: `name`).
+*   `Project`: Collaborative student projects (fields: `title`, `description`, `status`).
+*   `MataKuliah`: Enrolled university courses (fields: `name`, `code`).
+
+### Relationship & Social Schema
+*   `HAS_PENDING_REQUEST`: Directed connection representing a pending friendship invitation.
+*   `IS_FRIENDS_WITH`: Bidirectional mutual friendship connection.
 
 ---
 
@@ -105,12 +110,6 @@ The backend contains optimized **Cypher** queries executing four key matchmaking
 ### 🔑 Environment Configuration
 Create a `.env` file in `apps/backend/` and configure your credentials (see `.env.example`):
 
-```env
-NEO4J_URI=neo4j+s://<your-aura-db-id>.do.neo4j.io
-NEO4J_USERNAME=neo4j
-NEO4J_PASSWORD=<your-aura-password>
-PORT=3001
-```
 
 ### ⚙️ Installation & Development
 
