@@ -73,16 +73,16 @@ graph TD
 
 The backend contains optimized **Cypher** queries executing four key matchmaking methodologies:
 
-1.  **Search by Academic Filters**
-    *   *Mechanism*: Filters student profiles based on strict intersections of `Fakultas`, `Jurusan`, or `Angkatan` nodes using dynamic `MATCH` and `WHERE` clauses.
-2.  **Recommendations by Shared Interests**
-    *   *Mechanism*: Computes overlap intersections of academic interests and orders peers by the count of mutual interest nodes.
-    *   *Cypher logic*: `MATCH (me:User {id: $userId})-[:INTERESTED_IN]->(i:Interest)<-[:INTERESTED_IN]-(other:User) RETURN other, count(i) ORDER BY count(i) DESC`
-3.  **Project Skill-Gap Matchmaking**
-    *   *Mechanism*: Connects active collaborative projects to prospective students holding required skillset nodes.
-    *   *Cypher logic*: `MATCH (me:User)-[:WORKING_ON]->(p:Project)-[:REQUIRES_SKILL]->(s:Skill)<-[:HAS_SKILL]-(other:User) RETURN other`
+1.  **Search by Academic Filters (Case-Insensitive & Dynamic)**
+    *   *Mechanism*: Dynamically matches student profiles using partial, case-insensitive string filtering (`toLower` and `CONTAINS`) against linked `Fakultas`, `Jurusan`, or `Angkatan` relationships. If a filter is empty or set to "Semua", it is gracefully ignored.
+2.  **Recommendations by Shared Interests (Case-Insensitive)**
+    *   *Mechanism*: Computes overlapping academic interests by evaluating matching string names (case-insensitive) between nodes and sorting by interest density.
+    *   *Cypher logic*: `MATCH (me:User {id: $userId})-[:INTERESTED_IN]->(myInt:Interest), (other:User)-[:INTERESTED_IN]->(otherInt:Interest) WHERE me.id <> other.id AND toLower(myInt.name) = toLower(otherInt.name) RETURN other, count(otherInt) AS mutualInterests ORDER BY mutualInterests DESC`
+3.  **Mutual Skills Matchmaking (Case-Insensitive)**
+    *   *Mechanism*: Identifies peer suggestions sharing mutual skillsets based on case-insensitive string matching of connected `Skill` nodes.
+    *   *Cypher logic*: `MATCH (me:User {id: $userId})-[:HAS_SKILL]->(mySkill:Skill), (other:User)-[:HAS_SKILL]->(otherSkill:Skill) WHERE me.id <> other.id AND toLower(mySkill.name) = toLower(otherSkill.name) RETURN other, count(otherSkill) AS mutualSkillsCount ORDER BY mutualSkillsCount DESC`
 4.  **Academic Proximity & Social Graph**
-    *   *Mechanism*: Evaluates relational proximity by prioritizing mutual friends (2-degree friendship paths) combined with departmental overlaps.
+    *   *Mechanism*: Evaluates relational proximity by prioritizing mutual friends (2-degree friendship paths) combined with major/academic year overlaps.
 
 ---
 

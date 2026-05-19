@@ -19,9 +19,9 @@ const recommendByInterest = async (req, res) => {
   }
 };
 
-const recommendByProjectSkills = async (req, res) => {
+const recommendBySkills = async (req, res) => {
   try {
-    const data = await recommendationModel.recommendByProjectSkills(req.userId);
+    const data = await recommendationModel.recommendBySkills(req.userId);
     res.json({ data });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -37,4 +37,4 @@ const recommendBySocialProximity = async (req, res) => {
   }
 };
 
-module.exports = { searchByFilters, recommendByInterest, recommendByProjectSkills, recommendBySocialProximity };
+module.exports = { searchByFilters, recommendByInterest, recommendBySkills, recommendBySocialProximity };

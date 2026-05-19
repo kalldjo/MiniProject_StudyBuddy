@@ -2,8 +2,10 @@ const userModel = require('../models/userModel');
 
 const updateProfile = async (req, res) => {
   try {
-    const { name, bio, profilePicture } = req.body;
-    const user = await userModel.updateProfile(req.userId, name, bio, profilePicture);
+    const { name, bio, profilePicture, fakultas, jurusan, angkatan } = req.body;
+    const user = await userModel.updateProfile(req.userId, name, bio, profilePicture, fakultas, jurusan, angkatan);
+    console.log('[DEBUG] updateProfile raw user result:', user);
+    if (user && user.passwordHash) delete user.passwordHash;
     res.json({ data: user });
   } catch (error) {
     res.status(500).json({ error: error.message });

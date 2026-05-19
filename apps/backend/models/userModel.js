@@ -1,15 +1,47 @@
 const { getSession } = require('../config/neo4j');
 
-const updateProfile = async (userId, name, bio, profilePicture) => {
+const updateProfile = async (userId, name, bio, profilePicture, fakultas, jurusan, angkatan) => {
   const session = getSession();
   try {
     const query = `
       MATCH (u:User {id: $userId})
       SET u.name = $name, u.bio = $bio, u.profilePicture = $profilePicture
-      RETURN u
+      
+      WITH u
+      OPTIONAL MATCH (u)-[oldJ:MAJORS_IN]->(:Jurusan)
+      DELETE oldJ
+      WITH u
+      FOREACH (ignoreMe IN CASE WHEN $jurusan <> "" AND $jurusan IS NOT NULL THEN [1] ELSE [] END |
+        MERGE (newJ:Jurusan {name: $jurusan})
+        MERGE (u)-[:MAJORS_IN]->(newJ)
+      )
+
+      WITH u
+      OPTIONAL MATCH (u)-[oldF:BELONGS_TO_FAKULTAS]->(:Fakultas)
+      DELETE oldF
+      WITH u
+      FOREACH (ignoreMe IN CASE WHEN $fakultas <> "" AND $fakultas IS NOT NULL THEN [1] ELSE [] END |
+        MERGE (newF:Fakultas {name: $fakultas})
+        MERGE (u)-[:BELONGS_TO_FAKULTAS]->(newF)
+      )
+
+      WITH u
+      OPTIONAL MATCH (u)-[oldA:CLASS_OF]->(:Angkatan)
+      DELETE oldA
+      WITH u
+      FOREACH (ignoreMe IN CASE WHEN $angkatan <> "" AND $angkatan IS NOT NULL THEN [1] ELSE [] END |
+        MERGE (newA:Angkatan {year: $angkatan})
+        MERGE (u)-[:CLASS_OF]->(newA)
+      )
+
+      WITH u
+      OPTIONAL MATCH (u)-[:MAJORS_IN]->(j:Jurusan)
+      OPTIONAL MATCH (u)-[:BELONGS_TO_FAKULTAS]->(f:Fakultas)
+      OPTIONAL MATCH (u)-[:CLASS_OF]->(a:Angkatan)
+      RETURN u { .*, jurusan: j.name, fakultas: f.name, angkatan: a.year } AS u
     `;
-    const result = await session.run(query, { userId, name, bio, profilePicture });
-    return result.records[0]?.get('u').properties;
+    const result = await session.run(query, { userId, name, bio, profilePicture, fakultas: fakultas || '', jurusan: jurusan || '', angkatan: angkatan || '' });
+    return result.records[0]?.get('u');
   } finally {
     await session.close();
   }

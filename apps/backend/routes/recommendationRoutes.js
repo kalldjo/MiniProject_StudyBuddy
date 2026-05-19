@@ -9,7 +9,7 @@ router.use(authMiddleware);
 
 router.get('/search', recommendationController.searchByFilters);
 router.get('/interests', recommendationController.recommendByInterest);
-router.get('/skills', recommendationController.recommendByProjectSkills);
+router.get('/skills', recommendationController.recommendBySkills);
 router.get('/social', recommendationController.recommendBySocialProximity);
 
 module.exports = router;
