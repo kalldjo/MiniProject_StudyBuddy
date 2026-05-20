@@ -8,14 +8,18 @@ const searchByFilters = async (fakultas, jurusan, angkatan) => {
       OPTIONAL MATCH (u)-[:MAJORS_IN]->(j:Jurusan)
       OPTIONAL MATCH (u)-[:BELONGS_TO_FAKULTAS]->(f:Fakultas)
       OPTIONAL MATCH (u)-[:CLASS_OF]->(a:Angkatan)
-      WHERE 
-        ($jurusan = 'Semua' OR $jurusan = '' OR $jurusan IS NULL OR toLower(j.name) CONTAINS toLower($jurusan))
-        AND ($fakultas = 'Semua' OR $fakultas = '' OR $fakultas IS NULL OR toLower(f.name) CONTAINS toLower($fakultas))
-        AND ($angkatan = 'Semua' OR $angkatan = '' OR $angkatan IS NULL OR toLower(toString(a.year)) CONTAINS toLower(toString($angkatan)))
+
+      WITH u, j, f, a
+
+      WHERE
+        ($jurusan IS NULL OR $jurusan = '' OR toLower(j.name) CONTAINS toLower($jurusan))
+        AND ($fakultas IS NULL OR $fakultas = '' OR toLower(f.name) CONTAINS toLower($fakultas))
+        AND ($angkatan IS NULL OR $angkatan = '' OR toString(a.year) CONTAINS toString($angkatan))
+
       RETURN u {
-        .*, 
-        jurusan: j.name, 
-        fakultas: f.name, 
+        .*,
+        jurusan: j.name,
+        fakultas: f.name,
         angkatan: a.year
       } AS u
     `;

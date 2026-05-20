@@ -231,6 +231,7 @@ export default function Dashboard() {
         }
 
         const response = await apiFetch(endpoint);
+        console.log(response);
         setDiscoverUsers(response.data || []);
       } catch (error) {
         console.error(error);
