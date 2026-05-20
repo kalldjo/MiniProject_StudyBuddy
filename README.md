@@ -23,6 +23,8 @@ An academic graph collaboration platform designed to help university students di
 | **Frontend** | **Next.js 16** + **TypeScript** | React 19 Client UI with elegant, Apple-inspired Human Interface guidelines (Glassmorphism design language). |
 | **Backend** | **Express.js** + **Node.js** | RESTful API controller layer connected directly to Neo4j using the native `neo4j-driver`. |
 | **Database** | **Neo4j AuraDB** | Cloud-native Property Graph Database for lightning-fast relation traversals and Cypher queries. |
+| **Real-time** | **Socket.io** | Real-time web socket server and client synchronization for messaging and in-app notifications. |
+| **GenAI Engine** | **Gemini AI Studio SDK** | Gemini 1.5 Flash assistant integration for generating graph schemas, milestones, brainstorming, and code. |
 | **Styling** | **Tailwind CSS v4** | Highly custom glassmorphism utility classes (`backdrop-blur-xl`, `bg-white/60`, custom typography). |
 
 ---
@@ -39,33 +41,78 @@ graph TD
     Angkatan([Angkatan])
     Skill([Skill])
     Interest([Interest])
-    Project([Project])
     MataKuliah([Mata Kuliah])
+    Project([Project])
+    Message([Message])
+    Flashcard([Flashcard])
+    CourseGrade([Course Grade])
+    Notification([Notification])
+    Opportunity([Opportunity])
+    Post([Post])
+    Certificate([Certificate])
 
     User -->|BELONGS_TO_FAKULTAS| Fakultas
     User -->|MAJORS_IN| Jurusan
     User -->|CLASS_OF| Angkatan
     User -->|HAS_SKILL| Skill
     User -->|INTERESTED_IN| Interest
-    User -->|WORKING_ON| Project
-    Project -->|REQUIRES_SKILL| Skill
+    User -->|ENROLLED_IN| MataKuliah
+    
     User -->|IS_FRIENDS_WITH| User
     User -->|HAS_PENDING_REQUEST| User
-    User -->|ENROLLED_IN| MataKuliah
+    
+    User -->|CREATED_PROJECT| Project
+    User -->|JOINED_PROJECT| Project
+    User -->|HAS_PENDING_JOIN_REQUEST| Project
+    Project -->|USES_SKILL| Skill
+    
+    User -->|SENT_MESSAGE| Message
+    Message -->|DELIVERED_TO| User
+    
+    User -->|CREATED_FLASHCARD| Flashcard
+    User -->|TRACKS_GRADE| CourseGrade
+    User -->|HAS_NOTIFICATION| Notification
+    
+    User -->|POSTED_OPPORTUNITY| Opportunity
+    User -->|APPLIED_FOR| Opportunity
+    
+    User -->|POSTED| Post
+    User -->|LIKED| Post
+    User -->|COMMENTED| Post
+    
+    User -->|EARNED_CERTIFICATE| Certificate
 ```
 
 ### Core Cypher Node Labels
-*   `User`: Student academic profile node (fields: `id`, `email`, `password` (hashed), `name`, `bio`, `profilePicture`).
-*   `Fakultas` / `Jurusan`: Faculty and major tags.
+*   `User`: Student academic profile node (fields: `id`, `email`, `password` (hashed), `name`, `bio`, `profilePicture`, `linkedin`, `github`, `instagram`).
+*   `Fakultas` / `Jurusan`: Faculty and major tags (field: `name`).
 *   `Angkatan`: Academic cohort year (field: `year`).
 *   `Skill`: Technical/academic skill nodes (field: `name`).
 *   `Interest`: Shared learning or domain interests (field: `name`).
-*   `Project`: Collaborative student projects (fields: `title`, `description`, `status`).
 *   `MataKuliah`: Enrolled university courses (fields: `name`, `code`).
+*   `Project`: Collaborative student projects (fields: `id`, `title`, `description`, `imageUrl`, `demoUrl`, `status`, `createdAt`).
+*   `Message`: Private chat message nodes (fields: `id`, `content`, `createdAt`, `senderId`, `receiverId`).
+*   `Flashcard`: Self-study review flashcard nodes (fields: `id`, `question`, `answer`, `difficulty`, `createdAt`).
+*   `CourseGrade`: Grade tracking record nodes (fields: `id`, `courseName`, `credits`, `grade`, `createdAt`).
+*   `Notification`: User action notifications (fields: `id`, `text`, `type`, `read`, `createdAt`).
+*   `Opportunity`: Lab assistant and project job openings (fields: `id`, `company`, `role`, `info`, `link`, `logoBg`, `createdAt`).
+*   `Post`: Social forum posts (fields: `id`, `content`, `imageUrl`, `createdAt`).
+*   `Certificate`: Academy course completion award nodes (fields: `id`, `courseTitle`, `earnedAt`, `certificateId`, `titleAwarded`).
 
 ### Relationship & Social Schema
 *   `HAS_PENDING_REQUEST`: Directed connection representing a pending friendship invitation.
 *   `IS_FRIENDS_WITH`: Bidirectional mutual friendship connection.
+*   `CREATED_PROJECT` / `JOINED_PROJECT`: Directed project authorship and membership status.
+*   `HAS_PENDING_JOIN_REQUEST`: Directed join project requests containing candidate information (`role`, `message`, `createdAt`).
+*   `USES_SKILL`: Directed project dependencies indicating skill prerequisites.
+*   `SENT_MESSAGE` / `DELIVERED_TO`: Chat routing edges between sender/receiver users and message nodes.
+*   `CREATED_FLASHCARD`: Link connecting users to their private flashcards.
+*   `TRACKS_GRADE`: Grade monitoring links linking users to academic scores.
+*   `HAS_NOTIFICATION`: Inboxes linking users to dynamic system notifications.
+*   `POSTED_OPPORTUNITY`: Career posts created by lab administrators/users.
+*   `APPLIED_FOR`: Applicant records linking students to career opportunities (`appliedAt`, `studentId`, `coverLetter`).
+*   `POSTED` / `LIKED` / `COMMENTED`: Social feed interactions between user profiles and posts.
+*   `EARNED_CERTIFICATE`: Credential links connecting academy graduates to their earned certificates.
 
 ---
 
