@@ -1,10 +1,11 @@
 const { getSession } = require('../config/neo4j');
 
-const searchByFilters = async (fakultas, jurusan, angkatan) => {
+const searchByFilters = async (currentUserId, fakultas, jurusan, angkatan) => {
   const session = getSession();
   try {
     const query = `
       MATCH (u:User)
+      WHERE u.id <> $currentUserId
       OPTIONAL MATCH (u)-[:MAJORS_IN]->(j:Jurusan)
       OPTIONAL MATCH (u)-[:BELONGS_TO_FAKULTAS]->(f:Fakultas)
       OPTIONAL MATCH (u)-[:CLASS_OF]->(a:Angkatan)
@@ -12,15 +13,37 @@ const searchByFilters = async (fakultas, jurusan, angkatan) => {
         ($jurusan = 'Semua' OR $jurusan = '' OR $jurusan IS NULL OR toLower(j.name) CONTAINS toLower($jurusan))
         AND ($fakultas = 'Semua' OR $fakultas = '' OR $fakultas IS NULL OR toLower(f.name) CONTAINS toLower($fakultas))
         AND ($angkatan = 'Semua' OR $angkatan = '' OR $angkatan IS NULL OR toLower(toString(a.year)) CONTAINS toLower(toString($angkatan)))
+      
+      MATCH (me:User {id: $currentUserId})
+      
+      OPTIONAL MATCH (u)-[:HAS_SKILL]->(s:Skill)
+      OPTIONAL MATCH (u)-[:INTERESTED_IN]->(int:Interest)
+      
+      WITH u, j, f, a, me,
+           collect(distinct s.name) AS skills,
+           collect(distinct int.name) AS interests,
+           exists((me)-[:IS_FRIENDS_WITH]-(u)) AS isFriend,
+           exists((me)-[:HAS_PENDING_REQUEST]->(u)) AS sentRequest,
+           exists((u)-[:HAS_PENDING_REQUEST]->(me)) AS receivedRequest
+           
       RETURN u {
         .*, 
         jurusan: j.name, 
         fakultas: f.name, 
-        angkatan: a.year
-      } AS u
+        angkatan: a.year,
+        skills: skills,
+        interests: interests
+      } AS user,
+      CASE
+        WHEN isFriend THEN 'friends'
+        WHEN sentRequest THEN 'pending'
+        WHEN receivedRequest THEN 'pending_received'
+        ELSE 'none'
+      END AS connectionStatus
     `;
     
     const params = {
+      currentUserId: currentUserId || '',
       fakultas: fakultas || null,
       jurusan: jurusan || null,
       angkatan: angkatan || null
@@ -28,9 +51,13 @@ const searchByFilters = async (fakultas, jurusan, angkatan) => {
     
     const result = await session.run(query, params);
     return result.records.map(record => {
-      const u = record.get('u');
-      if (u) delete u.passwordHash;
-      return u;
+      const user = record.get('user');
+      const connectionStatus = record.get('connectionStatus');
+      if (user) delete user.passwordHash;
+      return {
+        user,
+        connectionStatus
+      };
     });
   } finally {
     await session.close();

@@ -76,61 +76,72 @@ function DashboardContent() {
   const [posting, setPosting] = useState(false);
   const [creatingProject, setCreatingProject] = useState(false);
 
+  const [activeTag, setActiveTag] = useState('#Semua');
+  const feedTags = ['#Semua', '#StudyGroup', '#SharingMateri', '#BukuBekas', '#TanyaSoal'];
+
   // Hook to check for Scholar verification
   useEffect(() => {
     const isScholar = localStorage.getItem('is_study_buddy_scholar') === 'true';
     setIsScholarUser(isScholar);
   }, []);
 
-  const handleToggleComments = (postId: string) => {
-    setExpandedPostComments(prev => ({ ...prev, [postId]: !prev[postId] }));
-    if (!postCommentsList[postId]) {
-      setPostCommentsList(prev => ({
-        ...prev,
-        [postId]: [
-          {
-            id: 'c1',
-            author: { name: 'Sarah Amanda', jurusan: 'Informatika', angkatan: '2024' },
-            content: 'Great study stack! I am totally interested in joining this project team. Let\'s schedule a coordinate session!',
-            likes: 3,
-            hasLiked: false
-          },
-          {
-            id: 'c2',
-            author: { name: 'Rian Kurnia', jurusan: 'Sistem Informasi', angkatan: '2023' },
-            content: 'This is really outstanding, fits exactly SBD material. Is this session open for beginners too?',
-            likes: 1,
-            hasLiked: false
-          }
-        ]
-      }));
+  const handleToggleComments = async (postId: string) => {
+    const isNowExpanded = !expandedPostComments[postId];
+    setExpandedPostComments(prev => ({ ...prev, [postId]: isNowExpanded }));
+    
+    // ambil komentar riil dari backend jika diekspansi
+    if (isNowExpanded) {
+      try {
+        const response = await apiFetch(`/posts/${postId}/comments`);
+        setPostCommentsList(prev => ({
+          ...prev,
+          [postId]: response.data || []
+        }));
+      } catch (err) {
+        console.error('Gagal memuat komentar:', err);
+      }
     }
   };
 
-  const handleAddComment = (postId: string) => {
+  const handleAddComment = async (postId: string) => {
     const text = newCommentText[postId] || '';
     if (!text.trim()) return;
 
-    const newComment = {
-      id: `c_${Date.now()}`,
-      author: {
-        name: currentUser?.name || 'Me',
-        jurusan: currentUser?.jurusan || 'Student',
-        angkatan: unwrapNeo4jInt(currentUser?.angkatan) || '2025',
-        profilePicture: currentUser?.profilePicture || '',
-        isScholar: isScholarUser
-      },
-      content: text,
-      likes: 0,
-      hasLiked: false
-    };
-
-    setPostCommentsList(prev => ({
-      ...prev,
-      [postId]: [newComment, ...(prev[postId] || [])]
-    }));
-    setNewCommentText(prev => ({ ...prev, [postId]: '' }));
+    try {
+      const response = await apiFetch(`/posts/${postId}/comments`, {
+        method: 'POST',
+        body: JSON.stringify({ content: text })
+      });
+      
+      const newComment = response.data;
+      if (newComment) {
+        setPostCommentsList(prev => ({
+          ...prev,
+          [postId]: [...(prev[postId] || []), newComment]
+        }));
+        
+        // update count komentar lokal
+        setPosts(prev => prev.map(item => {
+          if (item.post?.id === postId) {
+            return {
+              ...item,
+              post: {
+                ...item.post,
+                commentsCount: (unwrapNeo4jInt(item.post.commentsCount) || 0) + 1
+              }
+            };
+          }
+          return item;
+        }));
+        
+        setNewCommentText(prev => ({ ...prev, [postId]: '' }));
+      }
+    } catch (err) {
+      console.error('Gagal menambah komentar:', err);
+      alert('Gagal mengirimkan komentar');
+    }
   };
+
 
   const handleLikeComment = (postId: string, commentId: string) => {
     setPostCommentsList(prev => ({
@@ -541,6 +552,27 @@ function DashboardContent() {
                 </div>
               </form>
 
+              {/* Category tags selector */}
+              <div className="flex gap-2 overflow-x-auto pb-1 max-w-full custom-scrollbar shrink-0">
+                {feedTags.map(tag => {
+                  const isActive = activeTag === tag;
+                  return (
+                    <button
+                      key={tag}
+                      type="button"
+                      onClick={() => setActiveTag(tag)}
+                      className={`px-4 py-1.5 rounded-full text-xs font-black transition-all ${
+                        isActive 
+                          ? 'bg-logo-gradient text-white shadow-sm scale-[1.02]' 
+                          : 'bg-white/60 hover:bg-white text-zinc-550 hover:text-zinc-800 border border-zinc-200/50 shadow-inner'
+                      }`}
+                    >
+                      {tag}
+                    </button>
+                  );
+                })}
+              </div>
+
               {/* Feed posts list */}
               {loadingPosts ? (
                 <div className="space-y-4">
@@ -548,13 +580,15 @@ function DashboardContent() {
                     <div key={i} className="h-44 rounded-3xl bg-white/40 animate-pulse border border-white/40" />
                   ))}
                 </div>
-              ) : posts.length === 0 ? (
-                <div className="text-center py-20 bg-white/40 border border-white/40 rounded-3xl text-zinc-400">
-                  No post written yet. Be the first to share something!
+              ) : posts.filter(item => activeTag === '#Semua' || item.post?.content?.includes(activeTag)).length === 0 ? (
+                <div className="text-center py-20 bg-white/40 border border-white/40 rounded-3xl text-zinc-400 text-xs font-semibold">
+                  No post written yet with {activeTag}. Be the first to share something!
                 </div>
               ) : (
                 <div className="flex flex-col gap-6">
-                  {posts.map((item, idx) => (
+                  {posts
+                    .filter(item => activeTag === '#Semua' || item.post?.content?.includes(activeTag))
+                    .map((item, idx) => (
                     <div key={item.post?.id || idx} className="p-6 bg-white/70 backdrop-blur-xl border border-white/40 shadow-sm rounded-3xl flex flex-col">
                       <div className="flex items-center justify-between gap-3 mb-4">
                         <div className="flex items-center gap-3">
@@ -611,9 +645,10 @@ function DashboardContent() {
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-3.658A8.967 8.967 0 0 1 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" />
                           </svg>
-                          <span>{postCommentsList[item.post?.id]?.length ?? 2} Comments</span>
+                          <span>{postCommentsList[item.post?.id]?.length ?? (unwrapNeo4jInt(item.post?.commentsCount) || 0)} Comments</span>
                         </button>
                       </div>
+
 
                       {/* Expandable Comments Drawer */}
                       {expandedPostComments[item.post?.id] && (
