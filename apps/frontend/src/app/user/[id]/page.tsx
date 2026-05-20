@@ -480,7 +480,6 @@ export default function UserProfileViewer() {
             <div>
               <p className="text-[10px] font-extrabold uppercase tracking-widest text-zinc-400 mb-3.5 px-3">Main Modules</p>
               <div className="flex flex-col gap-1">
-                {/* 1. Graph Explore */}
                 <button 
                   onClick={() => { setActiveView('graph_explorer'); }}
                   className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-xs font-bold transition text-left ${activeView === 'graph_explorer' ? 'bg-[#0071E3]/5 text-[#0071E3] border border-[#0071E3]/10' : 'text-[#5C6E80] hover:text-[#1D1D1F] hover:bg-zinc-50/50'}`}

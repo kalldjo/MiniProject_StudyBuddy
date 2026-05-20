@@ -142,6 +142,7 @@ export default function Navbar() {
             <div className="hidden md:flex items-center gap-8">
               <NavLink href="/" active={pathname === '/'}>Discover</NavLink>
               <NavLink href="/academy" active={pathname === '/academy'}>Academy 🎓</NavLink>
+              <NavLink href="/search" active={pathname === '/search'}>Search</NavLink>
               <NavLink href={`/user/${user?.id}?view=direct_sync`} active={false}>Chat</NavLink>
               <NavLink href={`/user/${user?.id}?view=notifications`} active={false}>Notification</NavLink>
               <NavLink href="/network" active={pathname === '/network'}>Connection</NavLink>
