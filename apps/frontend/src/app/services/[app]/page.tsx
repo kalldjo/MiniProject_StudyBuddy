@@ -79,7 +79,7 @@ interface CourseGrade {
 export default function ServicesPage() {
   const router = useRouter();
   const params = useParams();
-  const activeApp = (params?.app as string) || 'jual';
+  const activeApp = (params?.app as string) || 'gpa-calculator';
 
   // State configurations for all 15 apps
   // 1. Marketplace State
@@ -200,26 +200,71 @@ export default function ServicesPage() {
     { name: 'Jo Kalldjo', overlapScore: 78, classes: ['SBD', 'Sistem Operasi'], freeHours: '16:00 - 18:00', phone: '628221122334' }
   ];
 
-  // 15. Gantt Milestones State
-  const examDate = new Date();
-  examDate.setDate(examDate.getDate() + 14); // Countdown to 2 weeks from now
+  // 15. Custom Reminders System State
+  interface Reminder {
+    id: string;
+    title: string;
+    date: string;
+    priority: 'HIGH' | 'MID' | 'LOW';
+  }
+
+  const [reminders, setReminders] = useState<Reminder[]>([
+    { id: '1', title: 'Final Project SBD UI (Normalisasi & Cypher Setup)', date: new Date(Date.now() + 86400000).toISOString().split('T')[0], priority: 'HIGH' },
+    { id: '2', title: 'Evaluasi CRISP-DM & Data Preparation', date: new Date(Date.now() + 86400000 * 5).toISOString().split('T')[0], priority: 'MID' }
+  ]);
+  const [newReminderTitle, setNewReminderTitle] = useState('');
+  const [newReminderDate, setNewReminderDate] = useState('');
+  const [newReminderPriority, setNewReminderPriority] = useState<'HIGH' | 'MID' | 'LOW'>('HIGH');
   const [timeLeft, setTimeLeft] = useState('');
+
+  const handleAddReminder = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newReminderTitle.trim() || !newReminderDate) return;
+    const item: Reminder = {
+      id: Date.now().toString(),
+      title: newReminderTitle.trim(),
+      date: newReminderDate,
+      priority: newReminderPriority
+    };
+    setReminders([...reminders, item]);
+    setNewReminderTitle('');
+    setNewReminderDate('');
+  };
+
+  const handleDeleteReminder = (id: string) => {
+    setReminders(reminders.filter(r => r.id !== id));
+  };
 
   useEffect(() => {
     const timer = setInterval(() => {
-      const difference = +examDate - +new Date();
-      if (difference <= 0) {
-        setTimeLeft('SEKARANG EXAM! 🔥');
-      } else {
-        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
-        const minutes = Math.floor((difference / 1000 / 60) % 60);
-        const seconds = Math.floor((difference / 1000) % 60);
-        setTimeLeft(`${days} Hari ${hours} Jam ${minutes} Menit ${seconds} Detik`);
+      if (reminders.length === 0) {
+        setTimeLeft('No schedules added');
+        return;
       }
+      
+      const now = new Date().getTime();
+      const sortedFutureReminders = reminders
+        .map(r => ({ ...r, time: new Date(r.date + 'T23:59:59').getTime() }))
+        .filter(r => r.time > now)
+        .sort((a, b) => a.time - b.time);
+
+      if (sortedFutureReminders.length === 0) {
+        setTimeLeft('All schedules passed! 🔥');
+        return;
+      }
+
+      const closest = sortedFutureReminders[0];
+      const difference = closest.time - now;
+
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((difference / 1000 / 60) % 60);
+      const seconds = Math.floor((difference / 1000) % 60);
+      
+      setTimeLeft(`Countdown to "${closest.title}": ${days}d ${hours}h ${minutes}m ${seconds}s`);
     }, 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [reminders]);
 
   // WHITEBOARD LOGIC (HTML5 CANVAS DRAWING)
   useEffect(() => {
@@ -460,25 +505,11 @@ export default function ServicesPage() {
 
   // Sidebar Links config
   const navItems = [
-    { id: 'jual', label: 'Jual (Marketplace)', icon: '🛒', cat: 'Aplikasi Saya' },
-    { id: 'grup', label: 'Grup (Circles)', icon: '👥', cat: 'Aplikasi Saya' },
-    { id: 'kelola-tagihan', label: 'Kelola Tagihan (Split)', icon: '💳', cat: 'Aplikasi Saya' },
-    { id: 'flashcards', label: 'Flashcards (Spaced)', icon: '📇', cat: 'Aplikasi Saya' },
-    { id: 'gpa-calculator', label: 'GPA Calculator', icon: '📈', cat: 'Aplikasi Saya' },
-
-    { id: 'talent-insights', label: 'Talent Insights', icon: '📊', cat: 'Talenta & Karir' },
-    { id: 'posting-pekerjaan', label: 'Posting Pekerjaan', icon: '💼', cat: 'Talenta & Karir' },
-
-    { id: 'marketplace-layanan', label: 'Tutoring Exchange', icon: '🌐', cat: 'Jasa & Freelance' },
-    { id: 'lofi-lounge', label: 'Lofi Ambient Lounge', icon: '🎵', cat: 'Jasa & Freelance' },
-
-    { id: 'pasang-iklan', label: 'Pasang Iklan Banner', icon: '🎯', cat: 'Pemasaran & AI' },
-    { id: 'summarizer', label: 'AI Note Summarizer', icon: '🧠', cat: 'Pemasaran & AI' },
-
-    { id: 'learning', label: 'Learning Studio', icon: '📺', cat: 'Akademik Pro' },
-    { id: 'whiteboard', label: 'Canvas Whiteboard', icon: '✏️', cat: 'Akademik Pro' },
-    { id: 'matchmaker', label: 'Buddy Matchmaker', icon: '❤️', cat: 'Akademik Pro' },
-    { id: 'calendar', label: 'Exam Gantt Calendar', icon: '📅', cat: 'Akademik Pro' }
+    { id: 'gpa-calculator', label: 'GPA Calculator & Matrix', icon: '📈', cat: 'Aplikasi Premium' },
+    { id: 'calendar', label: 'Reminders', icon: '📅', cat: 'Aplikasi Premium' },
+    { id: 'matchmaker', label: 'Matchmaker', icon: '❤️', cat: 'Aplikasi Premium' },
+    { id: 'posting-pekerjaan', label: 'Jobs Info', icon: '💼', cat: 'Aplikasi Premium' },
+    { id: 'pasang-iklan', label: 'Event', icon: '🎯', cat: 'Aplikasi Premium' }
   ];
 
   return (
@@ -491,7 +522,7 @@ export default function ServicesPage() {
             <span className="text-3xl">⚡</span>
             <div>
               <h1 className="text-xl font-black text-[#1D1D1F] tracking-tight">StudyBuddy Premium Tools</h1>
-              <p className="text-xs font-semibold text-zinc-400 mt-0.5">Explore 15 state-of-the-art interactive micro-applications for UI students</p>
+              <p className="text-xs font-semibold text-zinc-400 mt-0.5">Explore 5 state-of-the-art interactive micro-applications for UI students</p>
             </div>
           </div>
           <Link href="/">
@@ -1587,45 +1618,89 @@ export default function ServicesPage() {
               </div>
             )}
 
-            {/* APP 15: MILESTONES GANTT CALENDAR */}
+            {/* APP 15: REMINDERS (INTERACTIVE SCHEDULES) */}
             {activeApp === 'calendar' && (
               <div className="flex flex-col gap-6">
                 <div className="border-b border-zinc-100 pb-4">
-                  <h2 className="text-base font-black text-zinc-800">📅 Exam Gantt Tracker & Countdown Matrix</h2>
-                  <p className="text-xs text-zinc-400 mt-1">Pantau sisa waktu menuju ujian akhir semester Sistem Basis Data secara real-time.</p>
+                  <h2 className="text-base font-black text-zinc-800">📅 Schedule Reminders & Timeline Matrix</h2>
+                  <p className="text-xs text-zinc-400 mt-1">Pantau sisa waktu menuju agenda akademik Anda secara real-time.</p>
                 </div>
 
                 <div className="flex flex-col gap-5">
                   {/* Countdown Jumbotron */}
                   <div className="p-6 bg-gradient-to-br from-indigo-900 to-zinc-950 text-white rounded-3xl text-center shadow-lg relative overflow-hidden">
-                    <span className="text-[10px] font-black tracking-widest text-indigo-400 uppercase">HITUNG MUNDUR UAS SBD</span>
+                    <span className="text-[10px] font-black tracking-widest text-indigo-400 uppercase">HITUNG MUNDUR JADWAL TERDEKAT</span>
                     <h3 className="text-xl sm:text-2xl font-black mt-2 font-mono tracking-tight text-amber-400">
                       {timeLeft || 'Memuat hitung mundur...'}
                     </h3>
-                    <p className="text-[10px] text-white/70 mt-2 font-semibold">Tandai tanggal di kalender dan selesaikan seluruh bab di Academy 🎓!</p>
                   </div>
 
-                  {/* Vertical Milestones Timeline */}
-                  <div className="flex flex-col gap-3">
-                    <span className="text-xs font-black text-zinc-400 px-1">Jadwal Tugas SBD & Fasilkom</span>
-                    
-                    <div className="p-4 bg-zinc-50 border border-zinc-150 rounded-2xl flex items-center gap-3 text-xs font-semibold">
-                      <span className="w-2.5 h-2.5 bg-rose-500 rounded-full shrink-0" />
-                      <div className="flex-1">
-                        <h4 className="text-zinc-700 font-extrabold">Final Project SBD UI (Normalisasi & Cypher Setup)</h4>
-                        <p className="text-[10px] text-zinc-400 mt-0.5">Deadline: Besok pukul 23:59 WIB</p>
-                      </div>
-                      <span className="px-2 py-0.5 bg-rose-50 text-rose-600 rounded text-[9px] font-black">HIGH PRIO</span>
+                  {/* Form to add reminder */}
+                  <form onSubmit={handleAddReminder} className="p-4.5 bg-zinc-50 border border-zinc-150 rounded-2xl flex flex-col gap-3">
+                    <span className="text-xs font-black text-zinc-500">Tambah Agenda / Schedule Baru</span>
+                    <input 
+                      type="text" 
+                      placeholder="Nama Agenda (misal: Kuis Praktikum SBD)" 
+                      value={newReminderTitle}
+                      onChange={e => setNewReminderTitle(e.target.value)}
+                      className="p-2.5 text-xs bg-white border border-zinc-200 rounded-xl focus:outline-none focus:border-indigo-500 font-semibold"
+                      required
+                    />
+                    <div className="grid grid-cols-2 gap-2">
+                      <input 
+                        type="date" 
+                        value={newReminderDate}
+                        onChange={e => setNewReminderDate(e.target.value)}
+                        className="p-2.5 text-xs bg-white border border-zinc-200 rounded-xl focus:outline-none focus:border-indigo-500 font-semibold text-zinc-700"
+                        required
+                      />
+                      <select 
+                        value={newReminderPriority} 
+                        onChange={e => setNewReminderPriority(e.target.value as any)}
+                        className="p-2.5 text-xs bg-white border border-zinc-200 rounded-xl text-zinc-650 font-bold text-zinc-700"
+                      >
+                        <option value="HIGH">HIGH PRIO</option>
+                        <option value="MID">MID PRIO</option>
+                        <option value="LOW">LOW PRIO</option>
+                      </select>
                     </div>
+                    <button type="submit" className="w-full mt-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black rounded-xl transition shadow-sm">
+                      Tambah Schedule
+                    </button>
+                  </form>
 
-                    <div className="p-4 bg-zinc-50 border border-zinc-150 rounded-2xl flex items-center gap-3 text-xs font-semibold">
-                      <span className="w-2.5 h-2.5 bg-amber-500 rounded-full shrink-0" />
-                      <div className="flex-1">
-                        <h4 className="text-zinc-700 font-extrabold">Evaluasi CRISP-DM & Data Preparation</h4>
-                        <p className="text-[10px] text-zinc-400 mt-0.5">Deadline: 5 Hari dari sekarang</p>
-                      </div>
-                      <span className="px-2 py-0.5 bg-amber-50 text-amber-600 rounded text-[9px] font-black">MID PRIO</span>
-                    </div>
+                  {/* Milestones List */}
+                  <div className="flex flex-col gap-3">
+                    <span className="text-xs font-black text-zinc-400 px-1">Daftar Agenda Pengingat</span>
+                    
+                    {reminders.length === 0 ? (
+                      <p className="text-xs text-zinc-400 text-center py-4 bg-zinc-50 border border-dashed border-zinc-200 rounded-2xl">Belum ada agenda belajar yang ditambahkan.</p>
+                    ) : (
+                      reminders.map(r => (
+                        <div key={r.id} className="p-4 bg-zinc-50 border border-zinc-150 rounded-2xl flex items-center gap-3 text-xs font-semibold justify-between">
+                          <div className="flex items-center gap-3">
+                            <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${r.priority === 'HIGH' ? 'bg-rose-500' : r.priority === 'MID' ? 'bg-amber-500' : 'bg-blue-500'}`} />
+                            <div className="flex-1">
+                              <h4 className="text-zinc-700 font-extrabold">{r.title}</h4>
+                              <p className="text-[10px] text-zinc-400 mt-0.5">Tanggal: {r.date}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className={`px-2 py-0.5 rounded text-[9px] font-black ${r.priority === 'HIGH' ? 'bg-rose-50 text-rose-600' : r.priority === 'MID' ? 'bg-amber-50 text-amber-600' : 'bg-blue-50 text-blue-600'}`}>
+                              {r.priority} PRIO
+                            </span>
+                            <button 
+                              type="button"
+                              onClick={() => handleDeleteReminder(r.id)}
+                              className="text-red-500 hover:text-red-700 font-bold px-1"
+                              title="Delete"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
               </div>

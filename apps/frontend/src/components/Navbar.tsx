@@ -141,8 +141,11 @@ export default function Navbar() {
           {isAuthenticated && (
             <div className="hidden md:flex items-center gap-8">
               <NavLink href="/" active={pathname === '/'}>Discover</NavLink>
-              <NavLink href="/ai" active={pathname === '/ai'}>AI Studio ✨</NavLink>
               <NavLink href="/academy" active={pathname === '/academy'}>Academy 🎓</NavLink>
+              <NavLink href={`/user/${user?.id}?view=direct_sync`} active={false}>Chat</NavLink>
+              <NavLink href={`/user/${user?.id}?view=notifications`} active={false}>Notification</NavLink>
+              <NavLink href="/network" active={pathname === '/network'}>Connection</NavLink>
+              <NavLink href={`/user/${user?.id}?view=profile&tab=projects`} active={false}>Project</NavLink>
             </div>
           )}
 
@@ -245,38 +248,10 @@ export default function Navbar() {
             {/* Content Area (Scrollable) */}
             <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6 custom-scrollbar">
               
-              {/* CATEGORY: APLIKASI SAYA */}
+              {/* CATEGORY: AKADEMIK & KELAS */}
               <div className="flex flex-col gap-3">
-                <span className="text-[10px] font-extrabold text-zinc-400 uppercase tracking-widest px-1">Aplikasi Utama</span>
+                <span className="text-[10px] font-extrabold text-zinc-400 uppercase tracking-widest px-1">Akademik & Kelas</span>
                 <div className="grid grid-cols-1 gap-2">
-                  <DrawerItem 
-                    icon="compass"
-                    title="Jual (Textbook & Gear)"
-                    subtitle="Peer-to-peer student marketplace exchange"
-                    onClick={() => { setShowAppsMenu(false); router.push('/services/jual'); }}
-                    color="bg-blue-500/10 text-blue-600 border-blue-500/20"
-                  />
-                  <DrawerItem 
-                    icon="users"
-                    title="Grup (Class Circles)"
-                    subtitle="Collaborate on course study groups"
-                    onClick={() => { setShowAppsMenu(false); router.push('/services/grup'); }}
-                    color="bg-indigo-500/10 text-indigo-600 border-indigo-500/20"
-                  />
-                  <DrawerItem 
-                    icon="receipt"
-                    title="Kelola Tagihan (Dorm Split)"
-                    subtitle="Track room expenses & printing ledger"
-                    onClick={() => { setShowAppsMenu(false); router.push('/services/kelola-tagihan'); }}
-                    color="bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
-                  />
-                  <DrawerItem 
-                    icon="layers"
-                    title="Flashcards (Study Decks)"
-                    subtitle="Active recall & spaced repetition review"
-                    onClick={() => { setShowAppsMenu(false); router.push('/services/flashcards'); }}
-                    color="bg-amber-500/10 text-amber-600 border-amber-500/20"
-                  />
                   <DrawerItem 
                     icon="trending-up"
                     title="GPA Calculator & Matrix"
@@ -284,103 +259,40 @@ export default function Navbar() {
                     onClick={() => { setShowAppsMenu(false); router.push('/services/gpa-calculator'); }}
                     color="bg-red-500/10 text-red-600 border-red-500/20"
                   />
-                </div>
-              </div>
-
-              {/* CATEGORY: KARYAWAN BERBAKAT */}
-              <div className="flex flex-col gap-3">
-                <span className="text-[10px] font-extrabold text-zinc-400 uppercase tracking-widest px-1">Talenta & Karir</span>
-                <div className="grid grid-cols-1 gap-2">
                   <DrawerItem 
-                    icon="pie-chart"
-                    title="Talent Insights"
-                    subtitle="Visual skills demand & UI alumni demographics"
-                    onClick={() => { setShowAppsMenu(false); router.push('/services/talent-insights'); }}
-                    color="bg-[#0071E3]/10 text-[#0071E3] border-[#0071E3]/20"
-                  />
-                  <DrawerItem 
-                    icon="briefcase"
-                    title="Posting Pekerjaan"
-                    subtitle="Apply for Lab Assistants & TA vacancies"
-                    onClick={() => { setShowAppsMenu(false); router.push('/services/posting-pekerjaan'); }}
-                    color="bg-violet-500/10 text-violet-600 border-violet-500/20"
+                    icon="calendar"
+                    title="Reminders"
+                    subtitle="Custom academic schedules & deadlines"
+                    onClick={() => { setShowAppsMenu(false); router.push('/services/calendar'); }}
+                    color="bg-fuchsia-500/10 text-fuchsia-600 border-fuchsia-500/20"
                   />
                 </div>
               </div>
 
-              {/* CATEGORY: PENJUALAN */}
+              {/* CATEGORY: KONEKSI & KARIR */}
               <div className="flex flex-col gap-3">
-                <span className="text-[10px] font-extrabold text-zinc-400 uppercase tracking-widest px-1">Jasa & Freelance</span>
+                <span className="text-[10px] font-extrabold text-zinc-400 uppercase tracking-widest px-1">Koneksi & Karir</span>
                 <div className="grid grid-cols-1 gap-2">
-                  <DrawerItem 
-                    icon="globe"
-                    title="Marketplace Layanan"
-                    subtitle="Peer tutoring, code reviews, writing help"
-                    onClick={() => { setShowAppsMenu(false); router.push('/services/marketplace-layanan'); }}
-                    color="bg-teal-500/10 text-teal-600 border-teal-500/20"
-                  />
-                  <DrawerItem 
-                    icon="music"
-                    title="Lofi Soundscape Lounge"
-                    subtitle="Binaural beats, ambient soundtracks, study rain"
-                    onClick={() => { setShowAppsMenu(false); router.push('/services/lofi-lounge'); }}
-                    color="bg-rose-500/10 text-rose-600 border-rose-500/20"
-                  />
-                </div>
-              </div>
-
-              {/* CATEGORY: PEMASARAN */}
-              <div className="flex flex-col gap-3">
-                <span className="text-[10px] font-extrabold text-zinc-400 uppercase tracking-widest px-1">Pemasaran & AI</span>
-                <div className="grid grid-cols-1 gap-2">
-                  <DrawerItem 
-                    icon="target"
-                    title="Pasang Iklan (Promo Event)"
-                    subtitle="Advertise campus events, seminars & tickets"
-                    onClick={() => { setShowAppsMenu(false); router.push('/services/pasang-iklan'); }}
-                    color="bg-sky-500/10 text-sky-600 border-sky-500/20"
-                  />
-                  <DrawerItem 
-                    icon="cpu"
-                    title="AI PDF Note Summarizer"
-                    subtitle="Paste study lecture scripts to visual bullets"
-                    onClick={() => { setShowAppsMenu(false); router.push('/services/summarizer'); }}
-                    color="bg-purple-500/10 text-purple-600 border-purple-500/20"
-                  />
-                </div>
-              </div>
-
-              {/* CATEGORY: LEARNING */}
-              <div className="flex flex-col gap-3">
-                <span className="text-[10px] font-extrabold text-zinc-400 uppercase tracking-widest px-1">Akademik Pro</span>
-                <div className="grid grid-cols-1 gap-2">
-                  <DrawerItem 
-                    icon="play-circle"
-                    title="Learning Studio"
-                    subtitle="Interactive video player & lecture playback"
-                    onClick={() => { setShowAppsMenu(false); router.push('/services/learning'); }}
-                    color="bg-[#54B589]/10 text-[#54B589] border-[#54B589]/20"
-                  />
-                  <DrawerItem 
-                    icon="edit-3"
-                    title="Interactive Whiteboard"
-                    subtitle="Real-time HTML5 sketchpad for study notes"
-                    onClick={() => { setShowAppsMenu(false); router.push('/services/whiteboard'); }}
-                    color="bg-orange-500/10 text-orange-600 border-orange-500/20"
-                  />
                   <DrawerItem 
                     icon="heart"
-                    title="Class Buddy Matchmaker"
+                    title="Matchmaker"
                     subtitle="Algorithm search for peers with class overlap"
                     onClick={() => { setShowAppsMenu(false); router.push('/services/matchmaker'); }}
                     color="bg-pink-500/10 text-pink-600 border-pink-500/20"
                   />
                   <DrawerItem 
-                    icon="calendar"
-                    title="Exam Gantt Calendar"
-                    subtitle="Countdown ledger of academic milestones"
-                    onClick={() => { setShowAppsMenu(false); router.push('/services/calendar'); }}
-                    color="bg-fuchsia-500/10 text-fuchsia-600 border-fuchsia-500/20"
+                    icon="briefcase"
+                    title="Jobs Info"
+                    subtitle="Apply for Lab Assistants & TA vacancies"
+                    onClick={() => { setShowAppsMenu(false); router.push('/services/posting-pekerjaan'); }}
+                    color="bg-violet-500/10 text-violet-600 border-violet-500/20"
+                  />
+                  <DrawerItem 
+                    icon="target"
+                    title="Event"
+                    subtitle="Advertise campus events, seminars & tickets"
+                    onClick={() => { setShowAppsMenu(false); router.push('/services/pasang-iklan'); }}
+                    color="bg-sky-500/10 text-sky-600 border-sky-500/20"
                   />
                 </div>
               </div>

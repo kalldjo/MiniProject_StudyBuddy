@@ -38,6 +38,7 @@ export default function Dashboard() {
   const [opportunities, setOpportunities] = useState<any[]>([]);
   const [loadingOpportunities, setLoadingOpportunities] = useState(true);
   const [showOpportunityModal, setShowOpportunityModal] = useState(false);
+  const [showProjectModal, setShowProjectModal] = useState(false);
   const [newOpportunity, setNewOpportunity] = useState({
     company: '',
     role: '',
@@ -761,22 +762,18 @@ export default function Dashboard() {
           {/* TAB 3: Projects showcase */}
           {activeCenterTab === 'projects' && (
             <div className="flex flex-col gap-6">
-              {/* Project Creator Form */}
-              <form onSubmit={handleCreateProject} className="bg-white/70 backdrop-blur-xl border border-white/40 shadow-[0_8px_32px_0_rgba(0,0,0,0.04)] rounded-3xl p-6">
-                <h3 className="font-semibold text-[#1D1D1F] text-sm mb-4">Showcase Your Project</h3>
-                <div className="flex flex-col gap-4">
-                  <Input label="Project Title" placeholder="e.g. StudyBuddy App" value={newProject.title} onChange={e => setNewProject({...newProject, title: e.target.value})} />
-                  <Input label="Short Description" placeholder="What does it solve? Who is it for?" value={newProject.description} onChange={e => setNewProject({...newProject, description: e.target.value})} />
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <Input label="Image URL (Optional)" placeholder="https://..." value={newProject.imageUrl} onChange={e => setNewProject({...newProject, imageUrl: e.target.value})} />
-                    <Input label="Demo Link (Optional)" placeholder="https://github.com/..." value={newProject.demoUrl} onChange={e => setNewProject({...newProject, demoUrl: e.target.value})} />
-                  </div>
-                  <Input label="Skills Used (Comma separated)" placeholder="React, Neo4j, Tailwind" value={newProject.skills} onChange={e => setNewProject({...newProject, skills: e.target.value})} />
-                  <Button type="submit" disabled={creatingProject || !newProject.title || !newProject.description} className="px-6 self-end !py-2 text-xs">
-                    {creatingProject ? 'Publishing...' : 'Upload Project'}
-                  </Button>
+              <div className="flex items-center justify-between bg-white/70 backdrop-blur-xl border border-white/40 shadow-sm p-6 rounded-3xl">
+                <div>
+                  <h3 className="text-xl font-bold text-[#1D1D1F] tracking-tight">Showcase Your Project</h3>
+                  <p className="text-xs text-zinc-500 mt-1">Explore existing class projects or share your own team study project with the community.</p>
                 </div>
-              </form>
+                <button 
+                  onClick={() => setShowProjectModal(true)}
+                  className="w-fit text-xs font-bold text-white bg-[#0071E3] hover:opacity-90 rounded-md py-2 px-4 transition shadow-sm"
+                >
+                  + Add Project
+                </button>
+              </div>
 
               {/* Projects Grid */}
               {loadingProjects ? (
@@ -1091,6 +1088,63 @@ export default function Dashboard() {
                 className="px-6 py-2 bg-logo-gradient text-white font-bold rounded-xl text-xs hover:opacity-90 shadow-md transition"
               >
                 Bagikan Oportunitas
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* ADD PROJECT MODAL OVERLAY */}
+      {showProjectModal && (
+        <div className="fixed inset-0 bg-black/45 backdrop-blur-md flex items-center justify-center z-[9999] animate-in fade-in duration-200">
+          <form 
+            onSubmit={async (e) => {
+              e.preventDefault();
+              await handleCreateProject(e);
+              setShowProjectModal(false);
+            }}
+            className="bg-white/90 backdrop-blur-2xl border border-white/50 shadow-[0_24px_64px_rgba(0,0,0,0.18)] max-w-md w-full mx-4 rounded-3xl p-6 md:p-8 animate-in zoom-in-95 duration-200 text-left flex flex-col gap-4"
+          >
+            <div className="flex justify-between items-start">
+              <div>
+                <span className="text-[9px] font-extrabold uppercase text-indigo-600 bg-indigo-50 border border-indigo-150 px-2.5 py-0.5 rounded">
+                  Academic Portfolio
+                </span>
+                <h3 className="text-base font-extrabold text-zinc-800 mt-2">Upload Project Baru</h3>
+              </div>
+              <button 
+                type="button"
+                onClick={() => setShowProjectModal(false)}
+                className="text-zinc-400 hover:text-zinc-600 font-bold text-xs"
+              >
+                ✕ Close
+              </button>
+            </div>
+
+            <div className="flex flex-col gap-4 mt-2">
+              <Input label="Project Title" placeholder="e.g. StudyBuddy App" value={newProject.title} onChange={e => setNewProject({...newProject, title: e.target.value})} />
+              <Input label="Short Description" placeholder="What does it solve? Who is it for?" value={newProject.description} onChange={e => setNewProject({...newProject, description: e.target.value})} />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Input label="Image URL (Optional)" placeholder="https://..." value={newProject.imageUrl} onChange={e => setNewProject({...newProject, imageUrl: e.target.value})} />
+                <Input label="Demo Link (Optional)" placeholder="https://github.com/..." value={newProject.demoUrl} onChange={e => setNewProject({...newProject, demoUrl: e.target.value})} />
+              </div>
+              <Input label="Skills Used (Comma separated)" placeholder="React, Neo4j, Tailwind" value={newProject.skills} onChange={e => setNewProject({...newProject, skills: e.target.value})} />
+            </div>
+
+            <div className="flex justify-end gap-3 mt-4 pt-4 border-t border-zinc-100">
+              <button 
+                type="button"
+                onClick={() => setShowProjectModal(false)}
+                className="px-4 py-2 text-zinc-500 hover:text-zinc-700 text-xs font-bold transition"
+              >
+                Batal
+              </button>
+              <button 
+                type="submit" 
+                disabled={creatingProject || !newProject.title || !newProject.description}
+                className="px-6 py-2 bg-logo-gradient text-white font-bold rounded-xl text-xs hover:opacity-90 shadow-md transition disabled:opacity-50"
+              >
+                {creatingProject ? 'Publishing...' : 'Publish Project'}
               </button>
             </div>
           </form>

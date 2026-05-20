@@ -480,30 +480,7 @@ export default function UserProfileViewer() {
             <div>
               <p className="text-[10px] font-extrabold uppercase tracking-widest text-zinc-400 mb-3.5 px-3">Main Modules</p>
               <div className="flex flex-col gap-1">
-                <Link href="/" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold text-[#5C6E80] hover:text-[#1D1D1F] hover:bg-zinc-50/50 transition">
-                  <svg className="w-4 h-4 text-zinc-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
-                  </svg>
-                  <span>Pulse Dashboard</span>
-                </Link>
-
-                <Link href="/network" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold text-[#5C6E80] hover:text-[#1D1D1F] hover:bg-zinc-50/50 transition">
-                  <svg className="w-4 h-4 text-zinc-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.109A12.018 12.018 0 0 1 12 20.25a12.018 12.018 0 0 1-3-.109v-.109m0-1.002A9.235 9.235 0 0 0 6 18.75m0-18.75a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9ZM6 18.75A4.125 4.125 0 0 0 2.25 22.5h7.5A4.125 4.125 0 0 0 6 18.75Zm9.75-9.75a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z" />
-                  </svg>
-                  <span>My Network</span>
-                </Link>
-
-                <button 
-                  onClick={() => { router.push('/'); }} 
-                  className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-xs font-bold text-[#5C6E80] hover:text-[#1D1D1F] hover:bg-zinc-50/50 transition text-left"
-                >
-                  <svg className="w-4 h-4 text-zinc-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                  </svg>
-                  <span>Partner Discovery</span>
-                </button>
-
+                {/* 1. Graph Explore */}
                 <button 
                   onClick={() => { setActiveView('graph_explorer'); }}
                   className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-xs font-bold transition text-left ${activeView === 'graph_explorer' ? 'bg-[#0071E3]/5 text-[#0071E3] border border-[#0071E3]/10' : 'text-[#5C6E80] hover:text-[#1D1D1F] hover:bg-zinc-50/50'}`}
@@ -511,66 +488,45 @@ export default function UserProfileViewer() {
                   <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5" />
                   </svg>
-                  <span>Graph Explorer</span>
-                </button>
-              </div>
-            </div>
-
-            {/* GROWTH */}
-            <div>
-              <p className="text-[10px] font-extrabold uppercase tracking-widest text-zinc-400 mb-3.5 px-3">Growth</p>
-              <div className="flex flex-col gap-1.5">
-                <button 
-                  onClick={() => { 
-                    setActiveView('profile'); 
-                    setActiveTab('projects'); 
-                  }}
-                  className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-xs font-bold text-[#5C6E80] hover:text-[#1D1D1F] hover:bg-zinc-50/50 transition text-left"
-                >
-                  <svg className="w-4 h-4 text-zinc-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 14.15v4.25c0 .966-.784 1.75-1.75 1.75H5.5a1.75 1.75 0 0 1-1.75-1.75V14.15m16.5 0a1.75 1.75 0 0 0-1.75-1.75H5.5a1.75 1.75 0 0 0-1.75 1.75m16.5 0V7.65c0-.966-.784-1.75-1.75-1.75H5.5a1.75 1.75 0 0 0-1.75 1.75v6.5m14 0c0-.828-.672-1.5-1.5-1.5s-1.5.672-1.5 1.5.672 1.5 1.5 1.5 1.5-.672 1.5-1.5Zm-11 0c0-.828-.672-1.5-1.5-1.5s-1.5.672-1.5 1.5.672 1.5 1.5 1.5 1.5-.672 1.5-1.5ZM12 3v3m0 0v3m0-3h3m-3 0H9" />
-                  </svg>
-                  <span>Projects & Ops</span>
+                  <span>Graph Explore</span>
                 </button>
 
-                {/* Notifications green pill widget, matching mockup */}
-                <button 
-                  onClick={() => setShowNotifications(!showNotifications)}
-                  className="flex items-center justify-between w-full px-4 py-3 bg-[#54B589] hover:bg-[#48A37A] text-white rounded-2xl font-extrabold text-xs shadow-md transition-all border border-[#48A37A] hover:scale-[1.01]"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
-                    </svg>
-                    <span>Notifications</span>
-                  </div>
-                  <span className="bg-red-500 text-white font-black text-[9px] px-1.5 py-0.5 rounded-full border border-white">
-                    {notifications.filter(n => !n.read).length}
-                  </span>
-                </button>
-
+                {/* 2. Chat */}
                 <button 
                   onClick={() => { setActiveView('direct_sync'); }}
                   className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-xs font-bold transition text-left ${activeView === 'direct_sync' ? 'bg-[#0071E3]/5 text-[#0071E3] border border-[#0071E3]/10' : 'text-[#5C6E80] hover:text-[#1D1D1F] hover:bg-zinc-50/50'}`}
                 >
-                  <svg className="w-4 h-4 text-zinc-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379L3.5 20.5h17l-1.92-2.134c1.153-.086 2.294-.213 3.423-.379 1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v5.01Z" />
                   </svg>
-                  <span>Direct Sync</span>
+                  <span>Chat</span>
                 </button>
-              </div>
-            </div>
 
-            {/* IDENTIFY */}
-            <div>
-              <p className="text-[10px] font-extrabold uppercase tracking-widest text-zinc-400 mb-3.5 px-3">Identify</p>
-              <div className="flex flex-col gap-1">
-                <Link href="/profile" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold text-[#5C6E80] hover:text-[#1D1D1F] hover:bg-zinc-50/50 transition">
+                {/* 3. Connection */}
+                <Link href="/network" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold text-[#5C6E80] hover:text-[#1D1D1F] hover:bg-zinc-50/50 transition">
                   <svg className="w-4 h-4 text-zinc-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.751A11.956 11.956 0 0112 2.714z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.109A12.018 12.018 0 0 1 12 20.25a12.018 12.018 0 0 1-3-.109v-.109m0-1.002A9.235 9.235 0 0 0 6 18.75m0-18.75a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9ZM6 18.75A4.125 4.125 0 0 0 2.25 22.5h7.5A4.125 4.125 0 0 0 6 18.75Zm9.75-9.75a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z" />
                   </svg>
-                  <span>Account Profile</span>
+                  <span>Connection</span>
                 </Link>
+
+                {/* 4. Notifications */}
+                <button 
+                  onClick={() => setShowNotifications(!showNotifications)}
+                  className="flex items-center justify-between w-full px-3 py-2.5 rounded-xl text-xs font-bold text-[#5C6E80] hover:text-[#1D1D1F] hover:bg-zinc-50/50 transition text-left"
+                >
+                  <div className="flex items-center gap-3">
+                    <svg className="w-4 h-4 text-zinc-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+                    </svg>
+                    <span>Notifications</span>
+                  </div>
+                  {notifications.filter(n => !n.read).length > 0 && (
+                    <span className="bg-red-500 text-white font-black text-[9px] px-1.5 py-0.5 rounded-full border border-white">
+                      {notifications.filter(n => !n.read).length}
+                    </span>
+                  )}
+                </button>
               </div>
             </div>
 
