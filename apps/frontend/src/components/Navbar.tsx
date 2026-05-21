@@ -383,6 +383,16 @@ export default function Navbar() {
                     }}
                     color="bg-fuchsia-500/10 text-fuchsia-600 border-fuchsia-500/20"
                   />
+                  <DrawerItem
+                    icon="search"
+                    title="Benchmark System"
+                    subtitle="Compare Relational vs Graph Database Performance"
+                    onClick={() => {
+                      setShowAppsMenu(false);
+                      router.push("/benchmark");
+                    }}
+                    color="bg-indigo-500/10 text-indigo-600 border-indigo-500/20"
+                  />
                 </div>
               </div>
 

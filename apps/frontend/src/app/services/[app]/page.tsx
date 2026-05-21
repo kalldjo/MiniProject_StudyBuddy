@@ -528,6 +528,7 @@ export default function ServicesPage() {
   const navItems = [
     { id: "gpa-calculator", label: "GPA Calculator & Matrix", icon: "" },
     { id: "calendar", label: "Reminders", icon: "" },
+    { id: "benchmark", label: "Benchmark System", icon: "" },
   ];
 
   return (
