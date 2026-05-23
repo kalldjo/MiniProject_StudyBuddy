@@ -133,6 +133,30 @@ The backend contains optimized **Cypher** queries executing four key matchmaking
 
 ---
 
+## 🔬 Benchmark: 6-Hop Database Benchmark (Neo4j vs. SQL)
+
+To prove the architectural superiority of the Graph paradigm over a Relational Database (RDBMS) for traversing complex, multi-hop student networks, we implemented an automated database benchmark comparing **Neo4j** against **SQLite** (configured *in-memory* with optimized indexes).
+
+### Methodology
+* **Dataset Scale**: 1,000 dummy users with 5,000 random bidirectional friendship connections (`IS_FRIENDS_WITH`), modeling a realistic university student cluster.
+* **Test Query**: A Friends-of-Friends (FoF) traversal anchored to a specific starting user up to a depth of **6-hops** (to force intermediate combinatorial explosion).
+* **System Warm-up**: Both databases executed a warm-up query before measuring to eliminate connection pool initialization and query caching biases.
+* **Repetitions**: Automated loop of **10 consecutive runs** to compute reliable averages, minimums, and maximums in a single click.
+
+### Benchmark Results (10-Run Iterations)
+
+Below is the experimental data showing response times in milliseconds (ms):
+
+
+![benchmark](https://raw.githubusercontent.com/kalldjo/StudyBuddy/refs/heads/main/docs/benchmark/benchmark.png)
+
+### Key Takeaways
+1. **Cartesian Explosion in SQL**: Even with optimized indexes and running completely in RAM (SQLite *in-memory*), SQL took an average of **51.91 ms** due to the CPU overhead of 6 levels of `JOIN` tables trying to compute B-Tree lookup intersections.
+2. **Sub-millisecond Graph Engine**: Neo4j traversed the exact same 6-hop path in just **1.70 ms** at the database engine level (over **30× faster**).
+3. **Network Isolation**: While the network overhead added about ~12ms to the Neo4j API call, the database core engine itself remained incredibly stable and scalable.
+
+---
+
 ## 📁 Repository Structure
 
 ```text
